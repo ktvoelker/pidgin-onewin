@@ -10,6 +10,8 @@ Make it not segfault when quitting.
 
 Make Ctrl-Tab work.
 
+Make the text-entry area be focused when a new conversation is opened.
+
 Make a config setting for the width of the buddy list, and find a graphical
 widgetty thing which allows the width of the buddy list and conversation window
 to be adjusted with the mouse.
