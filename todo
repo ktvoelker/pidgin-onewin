@@ -12,9 +12,11 @@ Make Ctrl-Tab work.
 
 Make the text-entry area be focused when a new conversation is opened.
 
-Make a config setting for the width of the buddy list, and find a graphical
-widgetty thing which allows the width of the buddy list and conversation window
-to be adjusted with the mouse.
+Change the Buddy List's size request to be very small, and then set the divider
+position at a reasonable default.
+
+Merge the menu bars so the Buddy List can be made narrower than its menus
+without hiding them.
 
 Change the metadata in the plugin.
 
