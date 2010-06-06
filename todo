@@ -2,6 +2,10 @@
 Pidgin Onewin TODO
 ==================
 
+Commit the code in Monotone for conformity's sake.
+
+Post to devel@pidgin.im about what I'm up to.
+
 Make it not segfault when quitting.
 
 Make Ctrl-Tab work.
