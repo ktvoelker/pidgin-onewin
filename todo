@@ -2,8 +2,6 @@
 Pidgin Onewin TODO
 ==================
 
-Make a git repo and put the plugin file in it, plus a diff of the other stuff.
-
 Make it not segfault when quitting.
 
 Make Ctrl-Tab work.
