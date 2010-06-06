@@ -1,0 +1,144 @@
+#
+# old_revision [52f4817b6a7b2db5cad41758c4911c0f20f77eb2]
+#
+# patch "pidgin/gtkblist.c"
+#  from [7a26a39217a1d40f3639c84f8b6bc06ab53b620f]
+#    to [5b72e07b98e6630e1d9b49e2f12ebe01e1ad2450]
+# 
+# patch "pidgin/gtkblist.h"
+#  from [4e1d7c35c67cd80e44fb277277e66f18476185cd]
+#    to [24f5ee0124555bdd4a40b435ce49b30db6d644ba]
+# 
+# patch "pidgin/gtkconv.c"
+#  from [cef422192a37a5966dba76f5b879e24470fce162]
+#    to [3e10050c77a220a26e80585e9ce9bdabd829d515]
+# 
+# patch "pidgin/gtkconv.h"
+#  from [14f29d7df218ed938bafdb7e36c274f124d39669]
+#    to [f3fc702b784d672eaf7d6f83ab10a77a39af0165]
+#
+============================================================
+--- pidgin/gtkblist.c	7a26a39217a1d40f3639c84f8b6bc06ab53b620f
++++ pidgin/gtkblist.c	5b72e07b98e6630e1d9b49e2f12ebe01e1ad2450
+@@ -5840,7 +5840,10 @@ static void pidgin_blist_show(PurpleBudd
+ 
+ 	gtkblist->main_vbox = gtk_vbox_new(FALSE, 0);
+ 	gtk_widget_show(gtkblist->main_vbox);
+-	gtk_container_add(GTK_CONTAINER(gtkblist->window), gtkblist->main_vbox);
++  gtkblist->hbox = gtk_hbox_new(FALSE, 0);
++  gtk_widget_show(gtkblist->hbox);
++  gtk_container_add(GTK_CONTAINER(gtkblist->hbox), gtkblist->main_vbox);
++	gtk_container_add(GTK_CONTAINER(gtkblist->window), gtkblist->hbox);
+ 
+ 	g_signal_connect(G_OBJECT(gtkblist->window), "delete_event", G_CALLBACK(gtk_blist_delete_cb), NULL);
+ 	g_signal_connect(G_OBJECT(gtkblist->window), "configure_event", G_CALLBACK(gtk_blist_configure_cb), NULL);
+============================================================
+--- pidgin/gtkblist.h	4e1d7c35c67cd80e44fb277277e66f18476185cd
++++ pidgin/gtkblist.h	24f5ee0124555bdd4a40b435ce49b30db6d644ba
+@@ -75,6 +75,7 @@ struct _PidginBuddyList {
+ 	GtkWidget *main_vbox;           /**< This vbox contains the menu and notebook */
+ 	GtkWidget *vbox;                /**< This is the vbox that everything important gets packed into.
+ 					   Your plugin might want to pack something in it itself.  Go, plugins! */
++  GtkWidget *hbox;
+ 
+ 	GtkWidget *treeview;            /**< It's a treeview... d'uh. */
+ 	GtkTreeStore *treemodel;        /**< This is the treemodel.  */
+============================================================
+--- pidgin/gtkconv.c	cef422192a37a5966dba76f5b879e24470fce162
++++ pidgin/gtkconv.c	3e10050c77a220a26e80585e9ce9bdabd829d515
+@@ -8624,7 +8624,7 @@ infopane_press_cb(GtkWidget *widget, Gdk
+ 	return FALSE;
+ }
+ 
+-static gboolean
++gboolean
+ notebook_press_cb(GtkWidget *widget, GdkEventButton *e, PidginWindow *win)
+ {
+ 	gint nb_x, nb_y, x_rel, y_rel;
+@@ -8712,7 +8712,7 @@ notebook_press_cb(GtkWidget *widget, Gdk
+ 	return FALSE;
+ }
+ 
+-static gboolean
++gboolean
+ notebook_release_cb(GtkWidget *widget, GdkEventButton *e, PidginWindow *win)
+ {
+ 	PidginWindow *dest_win;
+@@ -8833,7 +8833,7 @@ notebook_release_cb(GtkWidget *widget, G
+ }
+ 
+ 
+-static void
++void
+ before_switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
+                       gpointer user_data)
+ {
+@@ -8923,7 +8923,7 @@ static void close_tab_cb(GtkWidget *w, G
+ 		close_conv_cb(NULL, gtkconv);
+ }
+ 
+-static gboolean
++gboolean
+ right_click_menu_cb(GtkNotebook *notebook, GdkEventButton *event, PidginWindow *win)
+ {
+ 	GtkWidget *item, *menu;
+@@ -9102,7 +9102,7 @@ window_keypress_cb(GtkWidget *widget, Gd
+ 	return conv_keypress_common(gtkconv, event);
+ }
+ 
+-static void
++void
+ switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
+                gpointer user_data)
+ {
+@@ -9193,8 +9193,8 @@ create_icon_lists(GtkWidget *w)
+ 	prpl_lists = g_hash_table_new(g_str_hash, g_str_equal);
+ }
+ 
+-static void
+-plugin_changed_cb(PurplePlugin *p, gpointer data)
++void
++conv_plugin_changed_cb(PurplePlugin *p, gpointer data)
+ {
+ 	regenerate_plugins_items(data);
+ }
+@@ -9354,9 +9354,9 @@ pidgin_conv_window_new()
+ 
+ 	/* Update the plugin actions when plugins are (un)loaded */
+ 	purple_signal_connect(purple_plugins_get_handle(), "plugin-load",
+-			win, PURPLE_CALLBACK(plugin_changed_cb), win);
++			win, PURPLE_CALLBACK(conv_plugin_changed_cb), win);
+ 	purple_signal_connect(purple_plugins_get_handle(), "plugin-unload",
+-			win, PURPLE_CALLBACK(plugin_changed_cb), win);
++			win, PURPLE_CALLBACK(conv_plugin_changed_cb), win);
+ 
+ 
+ #ifdef _WIN32
+============================================================
+--- pidgin/gtkconv.h	14f29d7df218ed938bafdb7e36c274f124d39669
++++ pidgin/gtkconv.h	f3fc702b784d672eaf7d6f83ab10a77a39af0165
+@@ -301,4 +301,24 @@ void pidgin_conversations_uninit(void);
+ 
+ /*@}*/
+ 
++gboolean
++right_click_menu_cb(GtkNotebook *notebook, GdkEventButton *event, PidginWindow *win);
++
++void
++before_switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
++                      gpointer user_data);
++
++void
++switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
++               gpointer user_data);
++
++gboolean
++notebook_press_cb(GtkWidget *widget, GdkEventButton *e, PidginWindow *win);
++
++gboolean
++notebook_release_cb(GtkWidget *widget, GdkEventButton *e, PidginWindow *win);
++
++void
++conv_plugin_changed_cb(PurplePlugin *p, gpointer data);
++
+ #endif /* _PIDGIN_CONVERSATION_H_ */
