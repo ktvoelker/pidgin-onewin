@@ -1,0 +1,16 @@
+
+Pidgin Onewin TODO
+==================
+
+Make a git repo and put the plugin file in it, plus a diff of the other stuff.
+
+Make it not segfault when quitting.
+
+Make Ctrl-Tab work.
+
+Make a config setting for the width of the buddy list, and find a graphical
+widgetty thing which allows the width of the buddy list and conversation window
+to be adjusted with the mouse.
+
+Change the metadata in the plugin.
+
