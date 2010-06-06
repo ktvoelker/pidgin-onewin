@@ -21,7 +21,7 @@ get_fake_window()
 	static PidginWindow *win = NULL;
 	GtkPositionType pos;
 	GtkWidget *testidea;
-	// GtkWidget *menubar;
+	GtkWidget *menubar;
 	// GdkModifierType state;
 
   if (win != NULL) {
@@ -90,16 +90,21 @@ get_fake_window()
 
 	/* Setup the menubar. */
   // TODO make the menus appear in the Buddy List's menubar
-	// menubar = setup_menubar(win);
-	// gtk_box_pack_start(GTK_BOX(testidea), menubar, FALSE, TRUE, 0);
+	menubar = conv_setup_menubar(win);
+	gtk_box_pack_start(GTK_BOX(testidea), menubar, FALSE, TRUE, 0);
 
 	gtk_box_pack_start(GTK_BOX(testidea), win->notebook, TRUE, TRUE, 0);
 
   // TODO add testidea to the Buddy List window
 	// gtk_container_add(GTK_CONTAINER(win->window), testidea);
-  gtk_container_add(GTK_CONTAINER(pidgin_blist_get_default_gtk_blist()->hbox), testidea);
-
 	gtk_widget_show(testidea);
+  gtk_paned_pack2(
+      GTK_PANED(pidgin_blist_get_default_gtk_blist()->hpaned), testidea,
+      TRUE, FALSE);
+  gtk_widget_set_size_request(
+      gtk_paned_get_child1(
+        GTK_PANED(pidgin_blist_get_default_gtk_blist()->hpaned)),
+      300, -1);
 
 	/* Update the plugin actions when plugins are (un)loaded */
 	purple_signal_connect(purple_plugins_get_handle(), "plugin-load",
