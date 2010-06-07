@@ -10,6 +10,9 @@ Make it not segfault when quitting.
 
 Make Ctrl-Tab work.
 
+Make the color of conversation tab titles properly reset to normal when the tab
+is focused in any way.
+
 Make the text-entry area be focused when a new conversation is opened.
 
 Change the Buddy List's size request to be very small, and then set the divider
