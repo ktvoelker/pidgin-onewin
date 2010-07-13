@@ -42,19 +42,21 @@ get_fake_window()
 	// 	 create_icon_lists(win->window);
 	// }
 
-  // TODO should we cause focus_win_cb to be called when the Buddy List
-  // gets the focus?
-	// g_signal_connect(G_OBJECT(win->window), "focus_in_event",
-	//                  G_CALLBACK(focus_win_cb), win);
-
-	/* Intercept keystrokes from the menu items */
-  // TODO do we need this?
-	// g_signal_connect(G_OBJECT(win->window), "key_press_event",
-	// 				 G_CALLBACK(window_keypress_cb), win);
+  // TODO are we watching for these events on the right widget?
+  g_signal_connect(G_OBJECT(win->window), "delete_event",
+                   G_CALLBACK(conv_close_win_cb), win);
+	g_signal_connect(G_OBJECT(win->window), "focus_in_event",
+	                 G_CALLBACK(conv_focus_win_cb), win);
 
 
 	/* Create the notebook. */
 	win->notebook = gtk_notebook_new();
+
+	/* Intercept keystrokes from the menu items */
+  // TODO are we watching for this event on the right widget?
+  // It was originally on win->window.
+	g_signal_connect(G_OBJECT(win->window), "key_press_event",
+	                 G_CALLBACK(conv_window_keypress_cb), win);
 
 	pos = purple_prefs_get_int(PIDGIN_PREFS_ROOT "/conversations/tab_side");
 
@@ -150,14 +152,14 @@ static PurplePluginInfo info = {
     NULL,
     PURPLE_PRIORITY_DEFAULT,
 
-    "core-hello_world",
-    "Hello World!",
+    "core-onewin",
+    "One Window",
     "1.1",
 
-    "Hello World Plugin",          
-    "Hello World Plugin",          
-    "My Name <email@helloworld.tld>",                          
-    "http://helloworld.tld",     
+    "One Window Plugin",          
+    "One Window Plugin",          
+    "Karl Voelker <ktvoelker@gmail.com>",
+    "http://karlv.net",     
     
     plugin_load,                   
     plugin_unload,

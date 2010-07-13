@@ -2,24 +2,21 @@
 Pidgin Onewin TODO
 ==================
 
-Commit the code in Monotone for conformity's sake.
+Make Ctrl-Tab work when the conversations are focused.
 
-Post to devel@pidgin.im about what I'm up to.
+Add a keyboard shortcut for swapping focus between the Buddy List (if the
+focus is anywhere in the conversation area) and the conversation window (if
+the focus is anywhere in the Buddy List area).
 
-Make it not segfault when quitting.
-
-Make Ctrl-Tab work.
-
-Make the color of conversation tab titles properly reset to normal when the tab
-is focused in any way.
-
-Make the text-entry area be focused when a new conversation is opened.
-
-Change the Buddy List's size request to be very small, and then set the divider
-position at a reasonable default.
+Make the text-entry area be focused when a new conversation is manually
+opened. Note that this is a special, automatic invocation of the previous
+item.
 
 Merge the menu bars so the Buddy List can be made narrower than its menus
 without hiding them.
 
-Change the metadata in the plugin.
+Figure out how to run code when the plugin is enabled, and set our
+conversation placement mode automatically at that time.
+
+Make it not segfault when quitting.
 

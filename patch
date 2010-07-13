@@ -11,11 +11,15 @@
 # 
 # patch "pidgin/gtkconv.c"
 #  from [cef422192a37a5966dba76f5b879e24470fce162]
-#    to [679a2e0d5e2c63cd79da18051ef6853b8ffbd4f8]
+#    to [0691cd28574f707ca35f174be3b96169ae8343e9]
 # 
 # patch "pidgin/gtkconv.h"
 #  from [14f29d7df218ed938bafdb7e36c274f124d39669]
-#    to [405745e241b5145a192cd6cca41de7db820fda77]
+#    to [ab0111770628d9adeff822fdb6300dabea229d0c]
+# 
+# patch "pidgin/plugins/Makefile.am"
+#  from [77880be2c48ed0424818a3a12280a51af34afa69]
+#    to [58687a853ad0bd573d492a3b0bb94656ff1f3788]
 #
 ============================================================
 --- pidgin/gtkblist.c	7a26a39217a1d40f3639c84f8b6bc06ab53b620f
@@ -46,7 +50,7 @@
  	GtkTreeStore *treemodel;        /**< This is the treemodel.  */
 ============================================================
 --- pidgin/gtkconv.c	cef422192a37a5966dba76f5b879e24470fce162
-+++ pidgin/gtkconv.c	679a2e0d5e2c63cd79da18051ef6853b8ffbd4f8
++++ pidgin/gtkconv.c	0691cd28574f707ca35f174be3b96169ae8343e9
 @@ -3431,8 +3431,8 @@ focus_out_from_menubar(GtkWidget *wid, P
  				G_CALLBACK(focus_out_from_menubar), win);
  }
@@ -58,6 +62,28 @@
  {
  	GtkAccelGroup *accel_group;
  	const char *method;
+@@ -8336,8 +8336,8 @@ build_warn_close_dialog(PidginWindow *gt
+  * Callbacks
+  **************************************************************************/
+ 
+-static gboolean
+-close_win_cb(GtkWidget *w, GdkEventAny *e, gpointer d)
++gboolean
++conv_close_win_cb(GtkWidget *w, GdkEventAny *e, gpointer d)
+ {
+ 	PidginWindow *win = d;
+ 	GList *l;
+@@ -8422,8 +8422,8 @@ gtkconv_set_unseen(PidginConversation *g
+  * has looked at it so we know there are no longer unseen
+  * messages.
+  */
+-static gboolean
+-focus_win_cb(GtkWidget *w, GdkEventFocus *e, gpointer d)
++gboolean
++conv_focus_win_cb(GtkWidget *w, GdkEventFocus *e, gpointer d)
+ {
+ 	PidginWindow *win = d;
+ 	PidginConversation *gtkconv = pidgin_conv_window_get_active_gtkconv(win);
 @@ -8624,7 +8624,7 @@ infopane_press_cb(GtkWidget *widget, Gdk
  	return FALSE;
  }
@@ -85,6 +111,15 @@
  before_switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
                        gpointer user_data)
  {
+@@ -8861,7 +8861,7 @@ close_window(GtkWidget *w, PidginWindow 
+ static void
+ close_window(GtkWidget *w, PidginWindow *win)
+ {
+-	close_win_cb(w, NULL, win);
++	conv_close_win_cb(w, NULL, win);
+ }
+ 
+ static void
 @@ -8923,7 +8923,7 @@ static void close_tab_cb(GtkWidget *w, G
  		close_conv_cb(NULL, gtkconv);
  }
@@ -94,7 +129,18 @@
  right_click_menu_cb(GtkNotebook *notebook, GdkEventButton *event, PidginWindow *win)
  {
  	GtkWidget *item, *menu;
-@@ -9102,7 +9102,7 @@ window_keypress_cb(GtkWidget *widget, Gd
+@@ -9094,15 +9094,16 @@ infopane_entry_activate(PidginConversati
+ 	return TRUE;
+ }
+ 
+-static gboolean
+-window_keypress_cb(GtkWidget *widget, GdkEventKey *event, PidginWindow *win)
++gboolean
++conv_window_keypress_cb(
++    GtkWidget *widget, GdkEventKey *event, PidginWindow *win)
+ {
+ 	PidginConversation *gtkconv = pidgin_conv_window_get_active_gtkconv(win);
+ 
  	return conv_keypress_common(gtkconv, event);
  }
  
@@ -103,7 +149,7 @@
  switch_conv_cb(GtkNotebook *notebook, GtkWidget *page, gint page_num,
                 gpointer user_data)
  {
-@@ -9193,8 +9193,8 @@ create_icon_lists(GtkWidget *w)
+@@ -9193,8 +9194,8 @@ create_icon_lists(GtkWidget *w)
  	prpl_lists = g_hash_table_new(g_str_hash, g_str_equal);
  }
  
@@ -114,7 +160,24 @@
  {
  	regenerate_plugins_items(data);
  }
-@@ -9343,7 +9343,7 @@ pidgin_conv_window_new()
+@@ -9298,13 +9299,13 @@ pidgin_conv_window_new()
+ 	}
+ 
+ 	g_signal_connect(G_OBJECT(win->window), "delete_event",
+-	                 G_CALLBACK(close_win_cb), win);
++	                 G_CALLBACK(conv_close_win_cb), win);
+ 	g_signal_connect(G_OBJECT(win->window), "focus_in_event",
+-	                 G_CALLBACK(focus_win_cb), win);
++	                 G_CALLBACK(conv_focus_win_cb), win);
+ 
+ 	/* Intercept keystrokes from the menu items */
+ 	g_signal_connect(G_OBJECT(win->window), "key_press_event",
+-					 G_CALLBACK(window_keypress_cb), win);
++					 G_CALLBACK(conv_window_keypress_cb), win);
+ 
+ 
+ 	/* Create the notebook. */
+@@ -9343,7 +9344,7 @@ pidgin_conv_window_new()
  	testidea = gtk_vbox_new(FALSE, 0);
  
  	/* Setup the menubar. */
@@ -123,7 +186,7 @@
  	gtk_box_pack_start(GTK_BOX(testidea), menubar, FALSE, TRUE, 0);
  
  	gtk_box_pack_start(GTK_BOX(testidea), win->notebook, TRUE, TRUE, 0);
-@@ -9354,9 +9354,9 @@ pidgin_conv_window_new()
+@@ -9354,9 +9355,9 @@ pidgin_conv_window_new()
  
  	/* Update the plugin actions when plugins are (un)loaded */
  	purple_signal_connect(purple_plugins_get_handle(), "plugin-load",
@@ -137,8 +200,8 @@
  #ifdef _WIN32
 ============================================================
 --- pidgin/gtkconv.h	14f29d7df218ed938bafdb7e36c274f124d39669
-+++ pidgin/gtkconv.h	405745e241b5145a192cd6cca41de7db820fda77
-@@ -301,4 +301,27 @@ void pidgin_conversations_uninit(void);
++++ pidgin/gtkconv.h	ab0111770628d9adeff822fdb6300dabea229d0c
+@@ -301,4 +301,37 @@ void pidgin_conversations_uninit(void);
  
  /*@}*/
  
@@ -165,4 +228,55 @@
 +GtkWidget *
 +conv_setup_menubar(PidginWindow *win);
 +
++gboolean
++conv_window_keypress_cb(
++    GtkWidget *widget, GdkEventKey *event, PidginWindow *win);
++
++gboolean
++conv_focus_win_cb(GtkWidget *w, GdkEventFocus *e, gpointer d);
++
++gboolean
++conv_close_win_cb(GtkWidget *w, GdkEventAny *e, gpointer d);
++
  #endif /* _PIDGIN_CONVERSATION_H_ */
+============================================================
+--- pidgin/plugins/Makefile.am	77880be2c48ed0424818a3a12280a51af34afa69
++++ pidgin/plugins/Makefile.am	58687a853ad0bd573d492a3b0bb94656ff1f3788
+@@ -40,6 +40,7 @@ notify_la_LDFLAGS           = -module -a
+ iconaway_la_LDFLAGS         = -module -avoid-version
+ markerline_la_LDFLAGS       = -module -avoid-version
+ notify_la_LDFLAGS           = -module -avoid-version
++onewin_la_LDFLAGS           = -module -avoid-version
+ pidginrc_la_LDFLAGS         = -module -avoid-version
+ relnot_la_LDFLAGS           = -module -avoid-version
+ sendbutton_la_LDFLAGS       = -module -avoid-version
+@@ -60,11 +61,12 @@ plugin_LTLIBRARIES = \
+ 	iconaway.la         \
+ 	markerline.la       \
+ 	notify.la           \
++  onewin.la           \
+ 	pidginrc.la         \
+ 	relnot.la           \
+ 	sendbutton.la       \
+ 	spellchk.la         \
+-	themeedit.la         \
++	themeedit.la        \
+ 	timestamp.la        \
+ 	timestamp_format.la \
+ 	xmppconsole.la
+@@ -86,6 +88,7 @@ notify_la_SOURCES           = notify.c
+ iconaway_la_SOURCES         = iconaway.c
+ markerline_la_SOURCES       = markerline.c
+ notify_la_SOURCES           = notify.c
++onewin_la_SOURCES           = onewin.c
+ pidginrc_la_SOURCES         = pidginrc.c
+ relnot_la_SOURCES           = relnot.c
+ sendbutton_la_SOURCES       = sendbutton.c
+@@ -105,6 +108,7 @@ notify_la_LIBADD            = $(GTK_LIBS
+ iconaway_la_LIBADD          = $(GTK_LIBS)
+ markerline_la_LIBADD        = $(GTK_LIBS)
+ notify_la_LIBADD            = $(GTK_LIBS)
++onewin_la_LIBADD            = $(GTK_LIBS)
+ pidginrc_la_LIBADD          = $(GTK_LIBS)
+ relnot_la_LIBADD            = $(GLIB_LIBS)
+ sendbutton_la_LIBADD        = $(GTK_LIBS)
