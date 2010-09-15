@@ -2,6 +2,8 @@
 Pidgin Onewin TODO
 ==================
 
+Make the whole window not disappear when closing the last conversation.
+
 Make Ctrl-Tab work when the conversations are focused.
 
 Add a keyboard shortcut for swapping focus between the Buddy List (if the
